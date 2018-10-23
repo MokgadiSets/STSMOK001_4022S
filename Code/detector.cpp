@@ -27,18 +27,18 @@ int main(int argc, const char * argv[])
 {
 	//initailize cameras
 	printf("time 1= %ld\n",time(NULL));
-        VideoCapture capL("outputL.avi");
+        VideoCapture capL(0);
         if (!capL.isOpened()) {
                 cerr<<"Error: Unable to open the left camera" << endl;
                 return 0;
         }
 		capL.set(CV_CAP_PROP_POS_FRAMES, 2250-1);
-        VideoCapture capR("outputR.avi");
+        VideoCapture capR(0);
         if (!capR.isOpened()) {
                 cerr<<"Error: Unable to open the right camera" << endl;
                 return 0;
         }
-		capR.set(CV_CAP_PROP_POS_FRAMES, 2250-1);
+		
 	//left and right image matrices and grabbing
         Mat frameLDist;
 	Mat frameRDist;
@@ -48,15 +48,19 @@ int main(int argc, const char * argv[])
 		cout << time(NULL)<< endl;
 		capR >> frameRDist;
 		cout << time(NULL)<< endl;
-                 if (!(frameLDist.empty()) && !(frameRDist.empty())) {
-                     
+                 if (frameLDist.empty()) {
+			 cerr << "Unable to grab left frame" << endl;
+			 return 0;
+		 }
+		 if   (frameRDist.empty()) {
+			 cerr << "Unable to grab right frame" << endl;
+			 return 0;
+		 }
 		
-
-		//Keypoint detection using SURF
 		//Mat frameLGray, frameRGray;
-		//cvtColor(frameLDist, frameLGray,CV_BGR2GRAY);
+		//cvtColor(frameLDist, frameLGray,CV_BGR2GRAY); //These can be used to convert frames to grayscale
 		//cvtColor(frameRDist, frameRGray, CV_BGR2GRAY);
-		//Ptr<SURF> detector = SURF::create(100,7,5,false,true);
+	
 		Mat frameL, frameR;
 		undistort(frameLDist, frameL, LMatrix, distCoeffL);
 		undistort(frameRDist, frameR, RMatrix, distCoeffR);
@@ -90,7 +94,7 @@ int main(int argc, const char * argv[])
 			Mat img3;
 			drawMatches(frameL, keypointsL, frameR, keypointsR, matches, img3);
 			imwrite("/home/pi/4022S/images/matches.jpg", img3);
-			//waitKey();
+		
 
 			
 
@@ -127,10 +131,8 @@ int main(int argc, const char * argv[])
 					Rect border = boundingRect(cluster);
 					double aveDistance = depth/distances.size();
 					cout << depth << endl;
-					//double height = border.height * ((0.0011 * aveDistance/10) + 0.0145);
-					double height = border.height * ((0.0011 * 2300/10) + 0.0145);
-					//double width = border.width * ((0.0011 * aveDistance/10) + 0.086);
-					double width = border.width * ((0.0011 * 2300/10) + 0.086);
+					double height = border.height * ((0.0011 * aveDistance/10) + 0.0145);
+					double width = border.width * ((0.0011 * aveDistance/10) + 0.086);
 					rectangles.push_back(border);
 					aveDistances.push_back(aveDistance);
 					heights.push_back(height);
@@ -151,20 +153,19 @@ int main(int argc, const char * argv[])
 				cout << "-----------------" <<endl;
 			}
 			
-			imshow("rectangles", frameL);
+			//imshow("rectangles", frameL);    //for debugging purposes
 			imwrite("/home/pi/4022S/images/result.jpeg",frameL);
 			printf("time 2= %ld\n",time(NULL)); 
 			cout << "--------------------------------" << endl;
-
 		}
 		else {
 			cout << "" << endl;
 			cout << "-----------------" << endl;
 			cout << "Nothing interesting here!" << endl;
-			imshow("rectangles",frameL);
+			//imshow("rectangles",frameL); //for debugging purposes
 			
-		}}
-		if (waitKey(0)==27) {
+		}
+		if (waitKey(0)==27) {   //use the escape button to stop execution
 			break;
 		}
 	}
