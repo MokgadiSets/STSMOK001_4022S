@@ -1,5 +1,5 @@
 clear all;
-camera = cv.VideoCapture(-1);
+camera = cv.VideoCapture(0);
 pause(2);
 if ~camera.isOpened()
     error('camera failed to be initialized');
@@ -13,12 +13,12 @@ keypoints = cv.KeyPointsFilter.retainBest(keypoints1, 400);
 % toc
 points= [];
 imshow(frame);
-%imshow(cv.putText(a,'',[50,50],'BottomLeftOrigin', false, 'FontScale',0.5, 'Color','r'));
+
 hold on;
 for z =1: length(keypoints)
         points = [points; keypoints(z).pt];
 end
-%[labels, centers, compactness] = cv.kmeans(points,  2, 'Attempts', 4);
+
 [C, ptsC, centres] = dbscan(transpose(points), 70, 10);
 for d = 1: max(ptsC)
     ToPlot = [];
