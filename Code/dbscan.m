@@ -1,3 +1,42 @@
+DBSCAN DBSCAN clustering algorithm
+%
+% Usage:  [C, ptsC, centres] = dbscan(P, E, minPts)
+%
+% Arguments:
+%         P - dim x Npts array of points.
+%         E - Distance threshold.
+%    minPts - Minimum number of points required to form a cluster.
+%
+% Returns:
+%         C - Cell array of length Nc listing indices of points associated with
+%             each cluster.
+%      ptsC - Array of length Npts listing the cluster number associated with
+%             each point.  If a point is denoted as noise (not enough nearby
+%             elements to form a cluster) its cluster number is 0.
+%   centres - dim x Nc array of the average centre of each cluster.
+
+% Reference:
+% Martin Ester, Hans-Peter Kriegel, Jörg Sander, Xiaowei Xu (1996). "A
+% density-based algorithm for discovering clusters in large spatial databases
+% with noise".  Proceedings of the Second International Conference on Knowledge
+% Discovery and Data Mining (KDD-96). AAAI Press. pp. 226-231.  
+% Also see: http://en.wikipedia.org/wiki/DBSCAN
+
+% Copyright (c) 2013 Peter Kovesi
+% Centre for Exploration Targeting
+% The University of Western Australia
+% peter.kovesi at uwa edu au
+% 
+% Permission is hereby granted, free of charge, to any person obtaining a copy
+% of this software and associated documentation files (the "Software"), to deal
+% in the Software without restriction, subject to the following conditions:
+% 
+% The above copyright notice and this permission notice shall be included in 
+% all copies or substantial portions of the Software.
+%
+% The Software is provided "as is", without warranty of any kind.
+
+% PK January 2013
 function [C, ptsC, centres] = dbscan(P, E, minPts)
     
     [dim, Npts] = size(P);
