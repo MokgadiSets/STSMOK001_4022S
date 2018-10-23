@@ -1,3 +1,5 @@
+%Real time object detection with distance and size estimation
+
 clear all;
 cameraL = cv.VideoCapture(1);
 cameraR = cv.VideoCapture(2);
@@ -15,13 +17,7 @@ for i = 1:500
     right = cameraR.read();
 %%%%%%%%%%%%%%%%%%initializations%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
- 
 
-%bm = cv.StereoSGBM('MinDisparity',0);
-%bm.BlockSize = 1;
-%disparity2 = bm.compute(LeftRect,RightRect);
-
-%%%%%%%%%%%%%%%%%keypoints and descriptors%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Left
 keypointsL = detector.detect(left); 
 keypointsL = cv.KeyPointsFilter.retainBest(keypointsL, 400);
@@ -45,19 +41,8 @@ for e = 1:length(matchpointsL)
     pointsL = [pointsL ; matchpointsL(e).pt];
     pointsR = [pointsR ; matchpointsR(e).pt];
 end
-% figure; showMatchedFeatures(left,right,pointsL,pointsR);
-% for k = 1:length(matchpointsL)
-%     disp(k);
-%     disp(matchpointsL(k));
-%     disp(matchpointsR(k));
-% end
-% %%%%%%%%%%%%%%%%segmentation of points from keypoints%%%%%%%%%%%%%%%%%%
-% points = [];
-% for z =1: length(matchpointsR)
-%         points = [points; matchpointsR(z).pt];
-% end
-% imshow(RightRect);
- hold on;
+
+hold on;
 
 [C, ptsC, centres] = dbscan(transpose(pointsL), 40, 5); %adjust parameters depending on size of image
 % 
@@ -79,23 +64,14 @@ for d = 1: max(ptsC)
             
         elseif isequal(ptsC(c),d)
             ToPlot = [ToPlot; matchpointsR(c).pt];
-%             dispValue = disparity2(round(matchpointsL(c).pt(2)),round(matchpointsL(c).pt(1)));
-%             if (dispValue<1)
-%                 dispValue = 1;
-%             else
-%                 depth1 = [depth1; ((790.74*89 )/dispValue)];
-%             end
+
                 depth = [depth; ((779*89 )/(matchpointsL(c).pt(1)-matchpointsR(c).pt(1)))];
         end
     end       
     
     if (~isempty(ToPlot))
         output = cv.boundingRect(ToPlot);
-        %rectangle('Position', output, 'EdgeColor','b', 'LineWidth',1);
-        %hold on;
-        %str = sprintf(num2str(mode(depth)),5);
-        %str1= sprintf(num2str(mode(depth1)),5);
-        %annotation('textbox',[step1 step1 0.15 0.10],'string',str);
+
         position = [position; output];
         a = mode(depth);
         distances = [distances; a/1000];
